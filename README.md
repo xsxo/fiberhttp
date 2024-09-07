@@ -1,7 +1,7 @@
 # fiberhttp is high performance and simple HTTP library.
 
-source code: [github](https://github.com/xsxo/fiberhttp/)
-pypi project: [pypi](https://pypi.org/project/fiberhttp/)
+source code: [github](https://github.com/xsxo/fiberhttp/)<br/>
+pypi project: [pypi](https://pypi.org/project/fiberhttp/)<br/>
 
 install fiberhttp library on windows/linux/macos/other_os...<br/>
 ```bash
