@@ -6,7 +6,7 @@ README_FILE.close()
 
 setup(
     name='fiberhttp',
-    version='1.1',
+    version='1.2',
     author='xsxo',
     description='simple high performance http requests library',
     long_description=README,
