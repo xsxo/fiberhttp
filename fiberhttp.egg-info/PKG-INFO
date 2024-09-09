@@ -1,57 +1,129 @@
 Metadata-Version: 2.1
 Name: fiberhttp
-Version: 2.1
-Summary: simple, high performance http requests library
+Version: 1.2
+Summary: simple high performance http requests library
 Home-page: https://www.github.com/xsxo/fiberhttp
-Author: osmz
+Author: xsxo
 Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
 Classifier: Operating System :: OS Independent
-Classifier: License :: OSI Approved :: MIT License
+Classifier: License :: OSI Approved :: Apache Software License
 Description-Content-Type: text/markdown
 License-File: LICENSE
+License-File: NOTICE
 
-# fiberhttp is high performance and simple HTTP library.
+# Fiberhttp
+`Fiberhttp` is for high-performance library<br/>
 
-source code: [github](https://github.com/xsxo/fiberhttp/)
-pypi project: [pypi](https://pypi.org/project/fiberhttp/)
+[![Supported Versions](https://img.shields.io/pypi/pyversions/fiberhttp.svg)](https://pypi.org/project/fiberhttp)
 
-install fiberhttp library on windows/linux/macos/other_os...<br/>
+The [benchmarks](https://github.com/xsxso/fiberhttp/benchmarks) folder contains comparisons between `Fiberhttp` and other well-known libraries such as `requests`, `httpx`, `http.client`, and others. You will notice that `Fiberhttp` outperforms them every time<br/>
+
+
+## Fiberhttp might not for you
+
+Fiberhttp is designed to provide high performance but lacks many features like:
+
+**missing Features**:
+- No support for handling file 
+- No support for SOCKS proxies
+- No support for streaming requests
+
+If these features are important to you, and you value compatibility and functionality over performance, then the requests library might be a better choice for you.
+
+## Features:
+- Keep-alive (socket connection)
+- Build bytes request before send the request
+- Create socket connection with server before send the request
+- High-performance SSL/TLS handshake, verify
+- Reading responses in various formats such as JSON, headers, and cookies
+
+## How to use
+install Fiberhttp (supported all os systems)
 ```bash
 pip install fiberhttp
 ```
-how to use:<br/>
+
+`with client session`
 ```python3
-# 1 import fiberhttp library
 import fiberhttp
 
-# 2 create client to save your connections session
+# create client session with timeout
+# ! timeout not requierd
 cn = fiberhttp.client(timeout=10)
-cn_without_timeout = cn()
 
-# 3 send http request
-response = cn.get('https://httpbin.org/ip')
+# send get request
+res = cn.get('https://httpbin.org/ip')
 
-# 4 take response with any format
-print(response.json()['origin'])
-print(response.text())
-print(response.body())
-print(response.headers().get('User-Agent'))
-
-# 5 close connection after finish
-cn.close_host('httpbin.org')
-
-# 6 close all connections in the client
-cn.close()
+status_code = res.status_code()
+body = res.text()
+headers = res.headers()['Date']
+json = res.json()['origin']
 ```
 
-send http request directly, without keep connect session<br/>
+`without client session`
+```python3
+import fiberhttp
+
+# send request without create client
+response = fiberhttp.get('https://httpbin.org/ip')
+```
+
+`with proxies`
+```python3
+import fiberhttp
+
+# create client proxy
+cn = fiberhttp.client_proxy('http://20.111.54.16:8123')
+
+# send request after the proxy in the client session
+response = cn.get('https://httpbin.org/ip').json()['origin']
+print(response)
+```
+`use build request for high performance`
 
 ```python3
 import fiberhttp
 
-# send http request without client
-response = fiberhttp.get('https://httpbin.org')
-print(response.text())
+cn = fiberhttp.client()
+
+# build request with this format
+request = fiberhttp.build('GET', 'httpbin.org', '/ip')
+
+# send request after build it
+response = cn.send('httpbin.org', request).json()
 ```
 
-**soon fiberhttp will support proxies HTTP, HTTPS, SOCKS4, SOCKS5**<br/>
+`create connection with host before send request to reduce response time`
+
+```python3
+import fiberhttp
+
+cn = fiberhttp.client()
+
+request = fiberhttp.build('GET', 'httpbin.org', '/ip')
+cn.connect('httpbin.org')
+
+response = cn.send('httpbin.org', request).text()
+print(response)
+```
+
+`use build, create connection with proxies`
+```python3
+import fiberhttp
+
+cn = fiberhttp.client_proxy('http://username:password@host:port')
+
+# if the proxy has authentication, you must include the proxy_auth argument, which can be obtained from the client
+request = fiberhttp.build_proxy('GET', 'httpbin.org', '/ip', proxy_auth=cn.proxy_auth)
+
+# connect befor send not required; but its better for high peformance
+cn.connect('httpbin.org')
+
+response = cn.send('httpbin.org', request).text()
+print(response)
+```
