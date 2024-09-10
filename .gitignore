@@ -1,9 +1,3 @@
-<<<<<<< HEAD
 dist/
 fiberhttp.egg-info/
 build/
-=======
-/dist
-/fiberhttp.egg-info
-/build
->>>>>>> f52798e (add benchmarks)
