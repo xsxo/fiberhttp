@@ -1,46 +1,38 @@
-from http.client import HTTPSConnection
-from threading import Thread, Event
-from time import time
+from http.client import HTTPConnection
+from threading import Thread
+from time import sleep, time
 
-class counter:
+class counting:
     def __init__(self) -> None:
-        self.good, self.bad, self.error = 0, 0, 0
-        self.created = 0
+        self.ok = 0
+        self.error = 0
 
-event = Event()
-count = counter()
-threads = 10
-seconds = 10
+counter = counting()
+NUMBER = 1000000
+THREADS = 100
 
-headers = {'Content-Type': 'application/x-www-form-urlencoded'}
-body = 'username=ndoshy'
+def count():
+    while counter.ok <= NUMBER:
+        print(f'\rOK = {counter.ok}; ERR = {counter.error}', end=' ')
+        sleep(0.1)
+    print(f'\rOK = {counter.ok}; ERR = {counter.error}')
+    print(f'http.client Sent {NUMBER} HTTP Requests in {str(time() - start).split('.')[0]} Second With {THREADS} Threads')
 
-def counter_function():
-    while time() - start < seconds:
-        print(f'\rgood = {count.good}; bad = {count.bad}; error = {count.bad}', end=' ')
-    print(f'\rgood = {count.good}; bad = {count.bad}; error = {count.bad}, finished', end=' ')
-
-def benchmark():
-    cn = HTTPSConnection('httpbin.org', timeout=10)
-    count.created += 1
-    event.wait()
-    while time() - start < seconds:
+def test():
+    CN_HTTPCLIENT : HTTPConnection = HTTPConnection('localhost', timeout=1)
+    while counter.ok <= NUMBER:
         try:
-            cn.request('POST', '/post', body=body, headers=headers)
-            response = cn.getresponse()
-            if response.read().decode().__contains__('username'):
-                count.good += 1
+            CN_HTTPCLIENT.request('GET', '/')
+            RES = CN_HTTPCLIENT.getresponse()
+            if RES.read().decode('utf-8').__contains__('random'):
+                counter.ok += 1
             else:
-                count.bad += 1
+                counter.error += 1
         except:
-            count.error += 1
+            counter.error += 1
 
-for _ in range(threads):
-    Thread(target=benchmark).start()
-
-while count.created != threads:
-    pass
+Thread(target=count).start()
 
 start = time()
-Thread(target=counter_function).start()
-event.set()
+for _ in range(THREADS):
+    Thread(target=test).start()

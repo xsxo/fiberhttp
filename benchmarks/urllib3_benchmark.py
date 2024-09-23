@@ -1,4 +1,4 @@
-from httpx import Client, Request
+from urllib3 import PoolManager, request
 from threading import Thread
 from time import sleep, time
 
@@ -8,23 +8,23 @@ class counting:
         self.error = 0
 
 counter = counting()
+CN_URLLIB3 : PoolManager = PoolManager()
 NUMBER = 1000000
 THREADS = 100
-
-BUILD = Request('GET', 'http://localhost/')
 
 def count():
     while counter.ok <= NUMBER:
         print(f'\rOK = {counter.ok}; ERR = {counter.error}', end=' ')
         sleep(0.1)
     print(f'\rOK = {counter.ok}; ERR = {counter.error}')
-    print(f'httpx Sent {NUMBER} HTTP Requests in {str(time() - start).split('.')[0]} Second With {THREADS} Threads')
+    print(f'urllib3 Sent {NUMBER} HTTP Requests in {str(time() - start).split('.')[0]} Second With {THREADS} Threads')
 
 def test():
-    CN_HTTPX : Client = Client()
+    
     while counter.ok <= NUMBER:
         try:
-            if CN_HTTPX.send(BUILD).text.__contains__('random'):
+            RES = CN_URLLIB3.request('GET', 'http://localhost')
+            if RES.data.decode('utf-8').__contains__('random'):
                 counter.ok += 1
             else:
                 counter.error += 1

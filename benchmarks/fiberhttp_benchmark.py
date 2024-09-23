@@ -1,44 +1,37 @@
 from fiberhttp import client, build
-from threading import Thread, Event
-from time import time
+from threading import Thread
+from time import sleep, time
 
-class counter:
+class counting:
     def __init__(self) -> None:
-        self.good, self.bad, self.error = 0, 0, 0
-        self.created = 0
+        self.ok = 0
+        self.error = 0
 
-request = build('POST','httpbin.org', '/post', data={'username':'ndoshy'})
-event = Event()
-count = counter()
-threads = 10
-seconds = 10
+counter = counting()
+BUILD = build('GET', 'localhost', '/')
+NUMBER = 1000000
+THREADS = 100
 
-def counter_function():
-    while time() - start < seconds:
-        print(f'\rgood = {count.good}; bad = {count.bad}; error = {count.bad}', end=' ')
-    print(f'\rgood = {count.good}; bad = {count.bad}; error = {count.bad}, finished', end=' ')
+def count():
+    while counter.ok <= NUMBER:
+        print(f'\rOK = {counter.ok}; ERR = {counter.error}', end=' ')
+        sleep(0.1)
+    print(f'\rOK = {counter.ok}; ERR = {counter.error}')
+    print(f'FiberHTTP Sent {NUMBER} HTTP Requests in {str(time() - start).split('.')[0]} Second With {THREADS} Threads')
 
-def benchmark():
-    cn = client()
-    cn.connect('httpbin.org')
-    count.created += 1
-    event.wait()
-    while time() - start < seconds:
+def test():
+    CN_FIBERHTTP : client = client(timeout=0.4)
+    while counter.ok <= NUMBER:
         try:
-            response = cn.send('httpbin.org', request).text()
-            if response.__contains__('username'):
-                count.good += 1
+            if CN_FIBERHTTP.send('localhost', BUILD, ssl_verify=False).text().__contains__('random'):
+                counter.ok += 1
             else:
-                count.bad += 1
+                counter.error += 1
         except:
-            count.error += 1
+            counter.error += 1
 
-for _ in range(threads):
-    Thread(target=benchmark).start()
-
-while count.created != threads:
-    pass
+Thread(target=count).start()
 
 start = time()
-Thread(target=counter_function).start()
-event.set()
+for _ in range(THREADS):
+    Thread(target=test).start()
