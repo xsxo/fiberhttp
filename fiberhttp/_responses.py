@@ -14,7 +14,7 @@ class ExtractResponses:
         return self.__str__() 
 
     def text(self):
-        return str(self.response.split('\r\n\r\n')[1])
+        return str(self.response.split('\r\n\r\n', 1)[1])
     
     def status_code(self):
         return int(search(r'HTTP/1.1 (\d{3})', self.response).group(1))

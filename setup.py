@@ -6,15 +6,15 @@ README_FILE.close()
 
 setup(
     name='fiberhttp',
-    version='1.3.2',
+    version='2.0',
     author='xsxo',
-    description='high performance http requests library',
+    description='High Performance HTTP Requests Library',
     long_description=README,
     long_description_content_type='text/markdown',
     url='https://www.github.com/xsxo/fiberhttp',
     packages=find_packages(),
     install_requires=[
-        'certifi>=2024.8.30',
+        'certifi>=2017.4.17',
     ],
     classifiers=[
         'Programming Language :: Python :: 3',

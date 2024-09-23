@@ -5,6 +5,7 @@ from typing import Optional, Union
 from urllib.parse import urlparse, ParseResult
 from time import time
 from base64 import b64encode
+from re import search
 
 class client_proxy:
     def __init__(self, proxy:str, proxy_ssl:Union[bool, int]=0, timeout:int=10) -> None:
@@ -33,22 +34,35 @@ class client_proxy:
 
     def action(self, host:str, request:bytes) -> str:
         self.running = True
-        start = time()
         self.connection.send(request)
-        body : str = ''
+        response : bytes = b''
+        start = time()
 
         while time() - start < self.time_out:
-            try:
-                response = self.connection.recv(4096)
-                body += response.decode('utf-8')
-            except:
-                if body and len(body.split('\r\n\r\n')) == 2:
-                    break
+            data = self.connection.recv(4096)
+            body += data
+
+            if not data:
+                break
+
+            elif b'\r\n\r\n' in response:
+                headers, body = response.split(b'\r\n\r\n', 1)
+
+                content_length_match = search(rb'Content-Length: (\d+)', headers)
+                transfer_encoding_chunked = b'Transfer-Encoding: chunked' in headers
+
+                if content_length_match:
+                    content_length = int(content_length_match.group(1))
+                    if len(body) >= content_length:
+                        break
+                elif transfer_encoding_chunked:
+                    if b'0\r\n\r\n' in body:
+                        break
         else:
-            body = 'HTTP/1.1 408 TIMEOUT\r\nHOST: ' + host + '\r\n\r\nTIMEOUT' 
+            raise ValueError('timeout')
 
         self.running = False
-        return body
+        return response.decode('utf-8')
 
     def delete(self, url:str, headers:dict={}):
         return self.get(url, headers, 'DELETE')
@@ -67,7 +81,7 @@ class client_proxy:
             self.connect(host)
 
         if self.running:
-            return 'create a new client for each thread\nexample: https://github.com/xsxo/fiberhttp/benchmarks'
+            assert  ValueError('create a new client for each thread\nexample: https://github.com/xsxo/fiberhttp/tree/main/benchmarks')
 
         return ExtractResponses(self.action(host, build_proxy(method, host, url.split(host)[1:][0] or '/', headers, data, self.proxy_auth)))
 
@@ -79,7 +93,7 @@ class client_proxy:
             self.connect(host)
 
         if self.running:
-            return 'create a new client for each thread\nexample: https://github.com/xsxo/fiberhttp/benchmarks'
+            assert  ValueError('create a new client for each thread\nexample: https://github.com/xsxo/fiberhttp/tree/main/benchmarks')
         
         return ExtractResponses(self.action(host, build_proxy(method, host, url.split(host)[1:][0] or '/', headers, '', self.proxy_auth)))
     
@@ -91,14 +105,14 @@ class client_proxy:
         
         if self.proxy_port == 443:
             self.connection = load_ssl(self.connection, host)
-        else:
-            self.connection.setblocking(0)
+        # else:
+            # self.connection.setblocking(0)
 
         return ExtractResponses(RES)
 
     def send(self, host:str, build:bytes):
         if self.running:
-            return 'create a new client for each thread\nexample: https://github.com/xsxo/fiberhttp/benchmarks'
+            return 'create a new client for each thread\nexample: https://github.com/xsxo/fiberhttp/tree/main/benchmarks'
         elif host != self.host_connected:
             self.connect(host)
 

@@ -4,6 +4,7 @@ from ._build import build
 from typing import Optional, Union
 from urllib.parse import urlparse, ParseResult
 from time import time
+from re import search
 
 class client:
     def __init__(self, timeout:int=10) -> None:
@@ -25,22 +26,35 @@ class client:
 
     def action(self, host:str, request:bytes) -> str:
         self.running = True
-        start = time()
         self.hosts[host].send(request)
-        body : str = ''
+        response : bytes = b''
+        start = time()
 
         while time() - start < self.time_out:
-            try:
-                response = self.hosts[host].recv(4096)
-                body += response.decode('utf-8')
-            except:
-                if body and len(body.split('\r\n\r\n')) == 2:
-                    break
+            data = self.hosts[host].recv(4096)
+            response += data
+
+            if not data:
+                break
+            
+            elif b'\r\n\r\n' in response:
+                headers, body = response.split(b'\r\n\r\n', 1)
+
+                content_length_match = search(rb'Content-Length: (\d+)', headers)
+                transfer_encoding_chunked = b'Transfer-Encoding: chunked' in headers
+
+                if content_length_match:
+                    content_length = int(content_length_match.group(1))
+                    if len(body) >= content_length:
+                        break
+                elif transfer_encoding_chunked:
+                    if b'\n\r\n0\r\n\r\n' in body:
+                        break
         else:
-            body = 'HTTP/1.1 408 TIMEOUT\r\nHOST: ' + host + '\r\n\r\nTIMEOUT' 
+            raise ValueError('timeout')
 
         self.running = False
-        return body
+        return response.decode('utf-8')
 
     def delete(self, url:str, headers:dict={}):
         return self.get(url, headers, 'DELETE')
@@ -56,7 +70,7 @@ class client:
         host : str = parsed_url.hostname
 
         if self.running:
-            return 'create a new client for each thread\nexample: https://github.com/xsxo/fiberhttp/benchmarks'
+            assert  ValueError('create a new client for each thread\nexample: https://github.com/xsxo/fiberhttp/tree/main/benchmarks')
 
         elif host not in self.hosts:
             self.hosts[host] = new_connection(host, parsed_url.port or (80 if parsed_url.scheme == 'http' else 443))
@@ -68,7 +82,7 @@ class client:
         host : str = parsed_url.hostname
 
         if self.running:
-            return 'create a new client for each thread\nexample: https://github.com/xsxo/fiberhttp/benchmarks'
+            assert  ValueError('create a new client for each thread\nexample: https://github.com/xsxo/fiberhttp/tree/main/benchmarks')
 
         elif host not in self.hosts:
             self.hosts[host] = new_connection(host, parsed_url.port or (80 if parsed_url.scheme == 'http' else 443))        
@@ -81,7 +95,7 @@ class client:
 
     def send(self, host:str, build:bytes, ssl_verify:bool=True):
         if self.running:
-            return 'create a new client for each thread\nexample: https://github.com/xsxo/fiberhttp/benchmarks'
+            return 'create a new client for each thread\nexample: https://github.com/xsxo/fiberhttp/tree/main/benchmarks'
         elif host not in self.hosts:
             self.hosts[host] = new_connection(host, (443 if ssl_verify else 80))
 
