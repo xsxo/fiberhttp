@@ -32,7 +32,7 @@ class client_proxy:
         self.connection.close()
         return 'closed'
 
-    def action(self, host:str, request:bytes) -> str:
+    def action(self, request:bytes) -> str:
         self.running = True
         self.connection.send(request)
         response : bytes = b''
@@ -83,7 +83,7 @@ class client_proxy:
         if self.running:
             assert  ValueError('create a new client for each thread\nexample: https://github.com/xsxo/fiberhttp/tree/main/benchmarks')
 
-        return ExtractResponses(self.action(host, build_proxy(method, host, url.split(host)[1:][0] or '/', headers, data, self.proxy_auth)))
+        return ExtractResponses(self.action(build_proxy(method, host, parsed_url.path or '/' + url.split(host)[1].split(':')[0], headers, data, self.proxy_auth)))
 
     def get(self, url:str, headers:dict={}, method:str='GET'):
         parsed_url : ParseResult = urlparse(url)
@@ -95,7 +95,7 @@ class client_proxy:
         if self.running:
             assert  ValueError('create a new client for each thread\nexample: https://github.com/xsxo/fiberhttp/tree/main/benchmarks')
         
-        return ExtractResponses(self.action(host, build_proxy(method, host, url.split(host)[1:][0] or '/', headers, '', self.proxy_auth)))
+        return ExtractResponses(self.action(build_proxy(method, host, parsed_url.path or '/' + url.split(host)[1].split(':')[0], headers, '', self.proxy_auth)))
     
     def connect(self, host:str):
         self.host_connected = host

@@ -75,7 +75,7 @@ class client:
         elif host not in self.hosts:
             self.hosts[host] = new_connection(host, parsed_url.port or (80 if parsed_url.scheme == 'http' else 443))
 
-        return ExtractResponses(self.action(host, build(method, host, url.split(host)[1:][0] or '/', headers, data)))
+        return ExtractResponses(self.action(host, build(method, host, parsed_url.path or '/' + url.split(host)[1].split(':')[0], headers, data)))
 
     def get(self, url:str, headers:dict={}, method:str='GET'):
         parsed_url : ParseResult = urlparse(url)
@@ -87,7 +87,7 @@ class client:
         elif host not in self.hosts:
             self.hosts[host] = new_connection(host, parsed_url.port or (80 if parsed_url.scheme == 'http' else 443))        
 
-        return ExtractResponses(self.action(host, build(method, host, url.split(host)[1:][0] or '/', headers, '')))
+        return ExtractResponses(self.action(host, build(method, host, parsed_url.path or '/' + url.split(host)[1].split(':')[0], headers, '')))
     
     def connect(self, host:str, ssl_verify:bool=True):
         if host not in self.hosts:
@@ -95,7 +95,7 @@ class client:
 
     def send(self, host:str, build:bytes, ssl_verify:bool=True):
         if self.running:
-            return 'create a new client for each thread\nexample: https://github.com/xsxo/fiberhttp/tree/main/benchmarks'
+            assert  ValueError('create a new client for each thread\nexample: https://github.com/xsxo/fiberhttp/tree/main/benchmarks')
         elif host not in self.hosts:
             self.hosts[host] = new_connection(host, (443 if ssl_verify else 80))
 
