@@ -40,7 +40,7 @@ class client_proxy:
 
         while time() - start < self.time_out:
             data = self.connection.recv(4096)
-            body += data
+            response += data
 
             if not data:
                 break
@@ -62,7 +62,7 @@ class client_proxy:
             raise ValueError('timeout')
 
         self.running = False
-        return response.decode('utf-8')
+        return response
 
     def delete(self, url:str, headers:dict={}):
         return self.get(url, headers, 'DELETE')
@@ -83,7 +83,7 @@ class client_proxy:
         if self.running:
             assert  ValueError('create a new client for each thread\nexample: https://github.com/xsxo/fiberhttp/tree/main/benchmarks')
 
-        return ExtractResponses(self.action(build_proxy(method, host, parsed_url.path or '/' + url.split(host)[1].split(':')[0], headers, data, self.proxy_auth)))
+        return ExtractResponses(self.action(build_proxy(method, host, (parsed_url.path or '/') + ('?' + parsed_url.query if parsed_url.query else ''), headers, data, self.proxy_auth)))
 
     def get(self, url:str, headers:dict={}, method:str='GET'):
         parsed_url : ParseResult = urlparse(url)
@@ -95,7 +95,7 @@ class client_proxy:
         if self.running:
             assert  ValueError('create a new client for each thread\nexample: https://github.com/xsxo/fiberhttp/tree/main/benchmarks')
         
-        return ExtractResponses(self.action(build_proxy(method, host, parsed_url.path or '/' + url.split(host)[1].split(':')[0], headers, '', self.proxy_auth)))
+        return ExtractResponses(self.action(build_proxy(method, host, (parsed_url.path or '/') + ('?' + parsed_url.query if parsed_url.query else ''), headers, '', self.proxy_auth)))
     
     def connect(self, host:str):
         self.host_connected = host

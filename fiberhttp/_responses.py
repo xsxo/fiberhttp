@@ -4,20 +4,23 @@ from typing import Union
 
 class ExtractResponses:
     def __init__(self, response):
-        self.response:str = response
+        self.response:bytes = response
 
     def __str__(self) -> str:
-        reason = search(r'HTTP/1.1 (\d{3} .*)', self.response).group(1)
-        return f"satus_code; reason: {reason}"
+        reason = search(rb'HTTP/1.1 (\d{3} .*)', self.response).group(1)
+        return f"Reason: {reason.decode('utf-8')}"
     
     def __repr__(self) -> str:
         return self.__str__() 
 
-    def text(self):
-        return str(self.response.split('\r\n\r\n', 1)[1])
+    def content(self) -> bytes:
+        return self.response.split(b'\r\n\r\n', 1)[1]
+
+    def text(self) -> str:
+        return self.response.split(b'\r\n\r\n', 1)[1].decode('utf-8')
     
-    def status_code(self):
-        return int(search(r'HTTP/1.1 (\d{3})', self.response).group(1))
+    def status_code(self) -> int:
+        return int(search(rb'HTTP/1.1 (\d{3})', self.response).group(1))
 
     def json(self) -> dict:
         return loads(self.text())
@@ -27,10 +30,10 @@ class ExtractResponses:
         for_nothing : list = self.response.splitlines()[1:]
 
         for res in for_nothing:
-            if not res.__contains__(': '):
+            if not res.__contains__(b': '):
                 break
-            for_split = res.split(': ')
-            for_return[for_split[0]] = res.removeprefix(for_split[0] + ': ')
+            for_split = res.split(b': ')
+            for_return[for_split[0].decode('utf-8')] = res.removeprefix(for_split[0] + b': ').decode('utf-8')
 
         return for_return
     

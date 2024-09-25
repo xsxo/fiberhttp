@@ -54,7 +54,7 @@ class client:
             raise ValueError('timeout')
 
         self.running = False
-        return response.decode('utf-8')
+        return response
 
     def delete(self, url:str, headers:dict={}):
         return self.get(url, headers, 'DELETE')
@@ -75,7 +75,7 @@ class client:
         elif host not in self.hosts:
             self.hosts[host] = new_connection(host, parsed_url.port or (80 if parsed_url.scheme == 'http' else 443))
 
-        return ExtractResponses(self.action(host, build(method, host, parsed_url.path or '/' + url.split(host)[1].split(':')[0], headers, data)))
+        return ExtractResponses(self.action(host, build(method, host, (parsed_url.path or '/') + ('?' + parsed_url.query if parsed_url.query else ''), headers, data)))
 
     def get(self, url:str, headers:dict={}, method:str='GET'):
         parsed_url : ParseResult = urlparse(url)
@@ -87,7 +87,7 @@ class client:
         elif host not in self.hosts:
             self.hosts[host] = new_connection(host, parsed_url.port or (80 if parsed_url.scheme == 'http' else 443))        
 
-        return ExtractResponses(self.action(host, build(method, host, parsed_url.path or '/' + url.split(host)[1].split(':')[0], headers, '')))
+        return ExtractResponses(self.action(host, build(method, host, (parsed_url.path or '/') + ('?' + parsed_url.query if parsed_url.query else ''), headers, '')))
     
     def connect(self, host:str, ssl_verify:bool=True):
         if host not in self.hosts:
