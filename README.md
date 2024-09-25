@@ -14,7 +14,9 @@ Fiberhttp is designed to provide high performance but lacks many features like:
 **missing Features**:
 - No support for SOCKS proxies
 - No support for streaming requests
-- No Support redirects requests
+- No support redirects requests
+- No support compressed requests
+- No support chunked requests
 
 If these features are important to you, and you value compatibility and functionality over performance, then the requests library might be a better choice for you.
 
