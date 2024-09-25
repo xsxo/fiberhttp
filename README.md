@@ -12,12 +12,13 @@ The [benchmarks](https://github.com/xsxo/fiberhttp/tree/main/benchmarks) folder 
 Fiberhttp is designed to provide high performance but lacks many features like:
 
 **missing Features**:
-- No support for SOCKS proxies
-- No support for streaming requests
+- No support SOCKS proxies
+- No support streaming requests
 - No support redirects requests
 - No support compressed requests
 - No support chunked requests
 
+All these features are not supported by the library for the purpose of improving performance.<br/>
 If these features are important to you, and you value compatibility and functionality over performance, then the requests library might be a better choice for you.
 
 ## Features:
