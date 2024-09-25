@@ -1,7 +1,7 @@
 # Fiberhttp
 `FiberHTTP` High Performance HTTP Requests Library<br/>
 
-![GIF]([https://example.com/my-gif.gif](https://github.com/xsxo/fiberhttp/blob/main/media/1725894429188248.gif))
+![GIF](media/1725894429188248.gif)
 
 [![Supported Versions](https://img.shields.io/pypi/pyversions/fiberhttp.svg)](https://pypi.org/project/fiberhttp)
 
