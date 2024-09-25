@@ -1,8 +1,8 @@
 # Fiberhttp
-`FiberHTTP` High Performance HTTP Requests Library<br/>
 
 ![GIF](media/1725894429188248.gif)
 
+`FiberHTTP` High Performance HTTP Requests Library<br/>
 [![Supported Versions](https://img.shields.io/pypi/pyversions/fiberhttp.svg)](https://pypi.org/project/fiberhttp)
 
 The [benchmarks](https://github.com/xsxo/fiberhttp/tree/main/benchmarks) folder contains comparisons between `Fiberhttp` and other well-known libraries such as `requests`, `httpx`, `http.client`, and others. You will notice that `Fiberhttp` outperforms them every time<br/>
