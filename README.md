@@ -1,5 +1,7 @@
 # Fiberhttp
-`Fiberhttp` is for high-performance library<br/>
+`FiberHTTP` High Performance HTTP Requests Library<br/>
+
+![GIF]([https://example.com/my-gif.gif](https://github.com/xsxo/fiberhttp/blob/main/media/1725894429188248.gif))
 
 [![Supported Versions](https://img.shields.io/pypi/pyversions/fiberhttp.svg)](https://pypi.org/project/fiberhttp)
 
@@ -11,14 +13,15 @@ The [benchmarks](https://github.com/xsxo/fiberhttp/tree/main/benchmarks) folder 
 Fiberhttp is designed to provide high performance but lacks many features like:
 
 **missing Features**:
-- No support for handling file 
 - No support for SOCKS proxies
 - No support for streaming requests
+- No Support redirects requests
 
 If these features are important to you, and you value compatibility and functionality over performance, then the requests library might be a better choice for you.
 
 ## Features:
 - Keep-alive (socket connection)
+- Upload - download files
 - Build bytes request before send the request
 - Create socket connection with server before send the request
 - High-performance SSL/TLS handshake, verify
