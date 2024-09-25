@@ -52,6 +52,7 @@ headers = res.headers()['Date']
 json = res.json()['origin']
 ```
 
+
 `without client session`
 ```python3
 import fiberhttp
@@ -59,6 +60,7 @@ import fiberhttp
 # send request without create client
 response = fiberhttp.get('https://httpbin.org/ip')
 ```
+
 
 `with proxies`
 ```python3
@@ -71,7 +73,9 @@ cn = fiberhttp.client_proxy('http://20.111.54.16:8123')
 response = cn.get('https://httpbin.org/ip').json()['origin']
 print(response)
 ```
-`use build request for high performance`
+
+
+`use build request to get high performance`
 
 ```python3
 import fiberhttp
@@ -84,6 +88,7 @@ request = fiberhttp.build('GET', 'httpbin.org', '/ip')
 # send request after build it
 response = cn.send('httpbin.org', request).json()
 ```
+
 
 `create connection with host before send request to reduce response time`
 
@@ -98,6 +103,7 @@ cn.connect('httpbin.org')
 response = cn.send('httpbin.org', request).text()
 print(response)
 ```
+
 
 `use build, create connection with proxies`
 ```python3
