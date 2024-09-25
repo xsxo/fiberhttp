@@ -10,4 +10,4 @@
 ## v3.0 (24/9/25)
 ### support media files and bytes responses
 - Imporve reading response
-- Added respones.content() feauter to save files
+- Added respones.content() feature to save files
