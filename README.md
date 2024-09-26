@@ -99,6 +99,8 @@ import fiberhttp
 cn = fiberhttp.client()
 
 request = fiberhttp.request('GET', 'https://httpbni.org/ip')
+
+# create connection with host
 cn.connect('httpbin.org')
 
 response = cn.send('httpbin.org', request).text()
