@@ -4,7 +4,7 @@
 
 ![GIF](media/1725894429188248.gif)
 
-The [benchmarks](https://github.com/xsxo/fiberhttp/tree/main/benchmarks) folder contains comparisons between `Fiberhttp` and other well-known libraries such as `requests`, `httpx`, `http.client`, and others. You will notice that `Fiberhttp` outperforms them every time<br/>
+The [benchmarks](https://github.com/xsxo/fiberhttp/tree/main/benchmarks) folder contains comparisons between `FiberHTTP` and other well-known libraries such as `requests`, `httpx`, `http.client`, and others. You will notice that `FiberHTTP` outperforms them every time<br/>
 
 
 ## Fiberhttp might not for you
