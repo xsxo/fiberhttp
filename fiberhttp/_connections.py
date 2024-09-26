@@ -18,7 +18,8 @@ def new_connection_proxy(host:str, port:int) -> socket:
     connection.connect((host, port))
     return connection
     
-def load_ssl(connection:socket, host) -> SSLSocket:
-    context = SSLContext(PROTOCOL_TLS_CLIENT)
-    ssl_connection = context.wrap_socket(connection, server_hostname=host)
+def load_ssl(connection:socket) -> SSLSocket:
+    context = SSLContext()
+    ssl_connection = context.wrap_socket(connection)
+    context.load_verify_locations(where())
     return ssl_connection

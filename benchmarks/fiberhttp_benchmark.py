@@ -1,4 +1,4 @@
-from fiberhttp import client, build
+from fiberhttp import client, build, request
 from threading import Thread
 from time import sleep, time
 
@@ -8,7 +8,7 @@ class counting:
         self.error = 0
 
 counter = counting()
-BUILD = build('GET', 'localhost', '/')
+BUILD = request('GET', 'http://localhost/')
 NUMBER = 1000000
 THREADS = 100
 
@@ -23,7 +23,7 @@ def test():
     CN_FIBERHTTP : client = client(timeout=0.4)
     while counter.ok <= NUMBER:
         try:
-            if CN_FIBERHTTP.send('localhost', BUILD, ssl_verify=False).text().__contains__('random'):
+            if CN_FIBERHTTP.send(BUILD).text().__contains__('random'):
                 counter.ok += 1
             else:
                 counter.error += 1

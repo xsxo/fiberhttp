@@ -1,5 +1,5 @@
 import unittest
-from fiberhttp import client, build
+from fiberhttp import client, request
 
 class TestHttpClientRequests(unittest.TestCase):
 
@@ -9,10 +9,22 @@ class TestHttpClientRequests(unittest.TestCase):
     def tearDown(self):
         self.client.close()
 
-    def test_build(self):
-        request = build('GET', 'httpbin.org', '/ip')
+    def test_prepare(self):
+        REQ = request()
+
+        REQ.method = 'GET'
+        REQ.url = 'https://api64.ipify.org?format=json'
+        REQ.data = 'username=ahmed'
+        REQ.data = {'username':'ahmed', 'name':'ah'}
+        REQ.headers = {'Accept-Language': 'en-US,en;q=0.5'}
+        REQ.data = 'username=ahmed'
+        REQ.data = ''
+        REQ.url = 'https://api64.ipify.org?format=json'
+        REQ.url = 'https://httpbin.org/ip'
+
         self.client.connect('httpbin.org')
-        response = self.client.send('httpbin.org', request)
+
+        response = self.client.send(REQ)
         self.assertEqual(response.status_code(), 200)
         self.assertIn(list(response.json().keys())[0], 'origin')
 

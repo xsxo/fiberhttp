@@ -1,8 +1,7 @@
 from ._connections import new_connection
 from ._responses import ExtractResponses
-from ._build import build
+from ._build import request
 from typing import Optional, Union
-from urllib.parse import urlparse, ParseResult
 from time import time
 from re import search
 
@@ -24,17 +23,19 @@ class client:
             host.close()
         return 'closed'
 
-    def action(self, host:str, request:bytes) -> str:
+    def action(self, REQ:request) -> str:
         self.running = True
-        self.hosts[host].send(request)
+        host = REQ.parse.hostname
+
+        self.hosts[host].send(bytes(REQ))
         response : bytes = b''
         start = time()
 
         while time() - start < self.time_out:
-            data = self.hosts[host].recv(4096)
-            response += data
+            recv = self.hosts[host].recv(4096)
+            response += recv
 
-            if not data:
+            if not recv:
                 break
             
             elif b'\r\n\r\n' in response:
@@ -66,40 +67,47 @@ class client:
         return self.post(url, headers, data, 'PATCH')
 
     def post(self, url:str, headers:dict={}, data=Optional[Union[str, dict]], method:str='POST'):
-        parsed_url : ParseResult = urlparse(url)
-        host : str = parsed_url.hostname
+        REQ = request(method, url, headers, data)
+        host : str = REQ.parse.hostname
 
         if self.running:
             assert  ValueError('create a new client for each thread\nexample: https://github.com/xsxo/fiberhttp/tree/main/benchmarks')
 
         elif host not in self.hosts:
-            self.hosts[host] = new_connection(host, parsed_url.port or (80 if parsed_url.scheme == 'http' else 443))
+            self.hosts[host] = new_connection(host, REQ.parse.port or (80 if REQ.parse.scheme == 'http' else 443))
 
-        return ExtractResponses(self.action(host, build(method, host, (parsed_url.path or '/') + ('?' + parsed_url.query if parsed_url.query else ''), headers, data)))
+        return ExtractResponses(self.action(REQ))
 
     def get(self, url:str, headers:dict={}, method:str='GET'):
-        parsed_url : ParseResult = urlparse(url)
-        host : str = parsed_url.hostname
+        REQ = request(method, url, headers)
+        host : str = REQ.parse.hostname
 
         if self.running:
             assert  ValueError('create a new client for each thread\nexample: https://github.com/xsxo/fiberhttp/tree/main/benchmarks')
 
         elif host not in self.hosts:
-            self.hosts[host] = new_connection(host, parsed_url.port or (80 if parsed_url.scheme == 'http' else 443))        
+            self.hosts[host] = new_connection(host, REQ.parse.port or (80 if REQ.parse.scheme == 'http' else 443))        
 
-        return ExtractResponses(self.action(host, build(method, host, (parsed_url.path or '/') + ('?' + parsed_url.query if parsed_url.query else ''), headers, '')))
+        return ExtractResponses(self.action(REQ))
     
-    def connect(self, host:str, ssl_verify:bool=True):
-        if host not in self.hosts:
-            self.hosts[host] = new_connection(host, (443 if ssl_verify else 80))
+    def connect(self, host:str, port:int = 0, ssl:bool = True):
+        if port:
+            port = port
+        elif ssl:
+            port = 443
+        else:
+            port = 80
 
-    def send(self, host:str, build:bytes, ssl_verify:bool=True):
+        if host not in self.hosts:
+            self.hosts[host] = new_connection(host, port)
+
+    def send(self, REQ:request):
         if self.running:
             assert  ValueError('create a new client for each thread\nexample: https://github.com/xsxo/fiberhttp/tree/main/benchmarks')
-        elif host not in self.hosts:
-            self.hosts[host] = new_connection(host, (443 if ssl_verify else 80))
+        elif REQ.parse.hostname not in self.hosts:
+            self.hosts[REQ.parse.hostname] = new_connection(REQ.parse.hostname, REQ.parse.port or (80 if REQ.parse.scheme == 'http' else 443))
 
-        return ExtractResponses(self.action(host, build))
+        return ExtractResponses(self.action(REQ))
 
     def __enter__(self):
         return self

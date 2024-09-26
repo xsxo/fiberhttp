@@ -1,52 +1,71 @@
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urlparse
 from typing import Optional, Union
 
-def build(method:str, host:str, api:str, headers:dict={}, data:Optional[Union[str, dict]] = '') -> bytes:
+class request:
+    def __init__(self, method: str = None, url: str = None, headers: dict = None, data: Optional[Union[str, dict]] = '', auth_proxy: str = ''):
+        self.parse = None
+        self.api: str = ''
+        self.lower: list = []
+        self.BytesHeaders: str = ''
+        
+        self.method = method
+        self._url: str = url
+        self.auth_proxy: str = auth_proxy
+        self._headers = headers if headers is not None else {}
+        self.data = data
+
+        if self._url:
+            self.url = self._url
+
+    @property
+    def url(self):
+        return self._url
     
-    lower = [key.lower() for key in headers.keys()]
-    if not headers or not lower.__contains__('host'):
-        headers['Host'] = host
-    if not headers or not lower.__contains__('connection'):
-        headers['Connection'] = 'Keep-Alive'
-    if not headers or not lower.__contains__('user-agent'):
-        headers['User-Agent'] = 'Mozilla/5.0 Firefox/132.0'
+    @url.setter
+    def url(self, value: str) -> None:
+        self._url = value 
+        self.parse = urlparse(self._url)
+        self.api: str = (self.parse.path or '/') + ('?' + self.parse.query if self.parse.query else '')
+        self._set_default_headers()
 
-    my_headers = ''
-    for key, value in headers.items():
-        my_headers += key + ': ' + value + '\r\n'
+    @property
+    def headers(self):
+        return self._headers
 
-    if data:
-        if type(data) == dict:
-            data : str = urlencode(data)
+    @headers.setter
+    def headers(self, value: dict) -> None:
+        self._headers = value
+        self._set_default_headers()
 
-        if 'Content-Length' not in headers and 'content-length' not in headers:
-            my_headers += 'Content-Length: ' + str(len(data)) + '\r\n'
+    def _set_default_headers(self) -> None:
+        self.BytesHeaders = ''
+        self.lower = [key.lower() for key in self._headers.keys()]
 
-    my_headers += '\r\n'
-    
-    return f'{method} {api} HTTP/1.1\r\n{my_headers}{data}'.encode('utf-8')
+        if 'host' not in self.lower and self.parse:
+            self._headers['Host'] = self.parse.hostname        
+        
+        if 'connection' not in self.lower:
+            self._headers['Connection'] = 'Keep-Alive'
+        if 'user-agent' not in self.lower:
+            self._headers['User-Agent'] = 'Mozilla/5.0 Firefox/132.0'
 
-def build_proxy(method:str, host:str, api:str, headers={}, data:Optional[Union[str, dict]] = '', proxy_auth:str='') -> bytes:
+        self._headers['Content-Length'] = str(len(self.data))
 
-    lower = [key.lower() for key in headers.keys()]
-    if not headers or not lower.__contains__('host'):
-        headers['Host'] = host
-    if not headers or not lower.__contains__('connection'):
-        headers['Connection'] = 'Keep-Alive'
-    if not headers or not lower.__contains__('user-agent'):
-        headers['User-Agent'] = 'Mozilla/5.0 Firefox/132.0'
+        for key, value in self.headers.items():
+            self.BytesHeaders += f'{key}: {value}\r\n'
 
-    my_headers = ''
-    for key, value in headers.items():
-        my_headers += key + ': ' + value + '\r\n'
+    @property
+    def data(self):
+        return self._data
 
-    if data:
-        if type(data) == dict:
-            data : str = urlencode(data)
+    @data.setter
+    def data(self, data: Optional[Union[str, dict]]) -> None:
+        if isinstance(data, dict):
+            self._data = urlencode(data)
+        else:
+            self._data = data
 
-        if not headers or not lower.__contains__('content-length'):
-            my_headers += 'Content-Length: ' + str(len(data)) + '\r\n'
+        self._set_default_headers()
 
-    my_headers += '\r\n'
-    
-    return f'{method} {api} HTTP/1.1\r\n{my_headers}{proxy_auth}{data}'.encode('utf-8')
+    def __bytes__(self) -> bytes:
+        return f'{self.method} {self.api} HTTP/1.1\r\n{self.auth_proxy}{self.BytesHeaders}\r\n{self.data}'.encode('utf-8')

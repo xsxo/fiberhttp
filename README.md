@@ -12,22 +12,23 @@ The [benchmarks](https://github.com/xsxo/fiberhttp/tree/main/benchmarks) folder 
 Fiberhttp is designed to provide high performance but lacks many features like:
 
 **missing Features**:
-- No support SOCKS proxies
-- No support streaming requests
-- No support redirects requests
-- No support compressed requests
-- No support chunked requests
+- No Support streaming requests
+- No Support redirects requests
+- No Support compressed requests
+- No Support chunked requests
 
 All these features are not supported by the library for the purpose of improving performance.<br/>
 If these features are important to you, and you value compatibility and functionality over performance, then the requests library might be a better choice for you.
 
+
 ## Features:
 - Keep-alive (socket connection)
-- Upload - download files
-- Build bytes request before send the request
-- Create socket connection with server before send the request
+- Upload & Download Multi Files
+- Prepare bytes request before send
+- Create Connection with server before send the request
 - High-performance SSL/TLS handshake, verify
-- Reading responses in various formats such as JSON, headers, and cookies
+- Reading responses in various formats such as JSON, headers, Cookies
+
 
 ## How to use
 install Fiberhttp (supported all os systems)
@@ -40,7 +41,7 @@ pip install fiberhttp
 import fiberhttp
 
 # create client session with timeout
-# ! timeout not requierd
+# ! timeout arg not requierd
 cn = fiberhttp.client(timeout=10)
 
 # send get request
@@ -75,17 +76,17 @@ print(response)
 ```
 
 
-`use build request to get high performance`
+`use prepare request to get high performance`
 
 ```python3
 import fiberhttp
 
 cn = fiberhttp.client()
 
-# build request with this format
-request = fiberhttp.build('GET', 'httpbin.org', '/ip')
+# prepare request with this format
+request = fiberhttp.request('GET', 'https://httpbni.org/ip')
 
-# send request after build it
+# send request after prepare it
 response = cn.send('httpbin.org', request).json()
 ```
 
@@ -97,24 +98,7 @@ import fiberhttp
 
 cn = fiberhttp.client()
 
-request = fiberhttp.build('GET', 'httpbin.org', '/ip')
-cn.connect('httpbin.org')
-
-response = cn.send('httpbin.org', request).text()
-print(response)
-```
-
-
-`use build, create connection with proxies`
-```python3
-import fiberhttp
-
-cn = fiberhttp.client_proxy('http://username:password@host:port')
-
-# if the proxy has authentication, you must include the proxy_auth argument, which can be obtained from the client
-request = fiberhttp.build_proxy('GET', 'httpbin.org', '/ip', proxy_auth=cn.proxy_auth)
-
-# connect befor send not required; but its better for high peformance
+request = fiberhttp.request('GET', 'https://httpbni.org/ip')
 cn.connect('httpbin.org')
 
 response = cn.send('httpbin.org', request).text()

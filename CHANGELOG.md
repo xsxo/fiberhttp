@@ -8,6 +8,14 @@
 - Fix path of urls
 
 ## v3.0 (24/9/25)
-### support media files and bytes responses
+### Support Upload & Download Files
 - Imporve reading response
 - Added respones.content() feature to save files
+
+## v4.0 (24/9/26)
+### Added Preparing Requests Feature
+- Imporve sending requests
+- Imporve SSL Security
+- Added fiberhttp.request() feature
+- Removed `build` and `build_proxy` Functions
+- Removed `host` argument from `send` Function
