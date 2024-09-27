@@ -84,7 +84,7 @@ import fiberhttp
 cn = fiberhttp.client()
 
 # prepare request with this format
-request = fiberhttp.request('GET', 'https://httpbni.org/ip')
+request = fiberhttp.request('GET', 'https://httpbin.org/ip')
 
 # send request after prepare it
 response = cn.send('httpbin.org', request).json()
@@ -98,7 +98,7 @@ import fiberhttp
 
 cn = fiberhttp.client()
 
-request = fiberhttp.request('GET', 'https://httpbni.org/ip')
+request = fiberhttp.request('GET', 'https://httpbin.org/ip')
 
 # create connection with host
 cn.connect('httpbin.org')
