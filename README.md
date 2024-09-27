@@ -87,7 +87,7 @@ cn = fiberhttp.client()
 request = fiberhttp.request('GET', 'https://httpbin.org/ip')
 
 # send request after prepare it
-response = cn.send('httpbin.org', request).json()
+response = cn.send(request).json()
 ```
 
 
@@ -103,6 +103,6 @@ request = fiberhttp.request('GET', 'https://httpbin.org/ip')
 # create connection with host
 cn.connect('httpbin.org')
 
-response = cn.send('httpbin.org', request).text()
+response = cn.send(request).text()
 print(response)
 ```
