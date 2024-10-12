@@ -1,4 +1,4 @@
-from fiberhttp import client, build, request
+from fiberhttp import client, request
 from threading import Thread
 from time import sleep, time
 
