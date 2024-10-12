@@ -3,22 +3,31 @@ from typing import Optional, Union
 from json import dumps
 
 class request:
-    def __init__(self, method: str = None, url: str = None, headers: dict = None, data: Optional[Union[str, dict]] = '', json: dict = None, auth_proxy: str = ''):
+    def __init__(self, method: str = None, url: str = None, headers: dict = {}, data: Optional[Union[str, dict]] = '', json: dict = None, auth_proxy: str = ''):
         self.parse = None
         self.api: str = ''
-        self.lower: list = []
         self.BytesHeaders: str = ''
         self.setJson: bool = False
         
         self.method = method
         self._url: str = url
         self.auth_proxy: str = auth_proxy
-        self._headers = headers if headers is not None else {}
-        self._data = data
+        # self._headers = headers if headers is not None else {}
+        self._headers = headers
         self._json = json
+        self._data = data
 
         if self._url:
             self.url = self._url
+
+        if self._headers:
+            self.headers = headers
+
+        if self._data:
+            self.data = data
+
+        if self._json:
+            self.json = json
 
     @property
     def url(self):
@@ -42,19 +51,22 @@ class request:
 
     def _set_default_headers(self) -> None:
         self.BytesHeaders = ''
-        self.lower = [key.lower() for key in self._headers.keys()]
+        lower = [key.lower() for key in self._headers.keys()]
 
-        if 'host' not in self.lower and self.parse:
-            self._headers['Host'] = self.parse.hostname        
-        
-        if 'connection' not in self.lower:
-            self._headers['Connection'] = 'Keep-Alive'
-        if 'user-agent' not in self.lower:
-            self._headers['User-Agent'] = 'Mozilla/5.0 Firefox/132.0'
-        if self.setJson and 'content-type' not in self.lower:
-            self._headers['Content-Type'] = 'application/json'
+        if 'host' not in lower and self.parse:      
+            self.BytesHeaders += f'Host: {self.parse.hostname}\r\n'
 
-        self._headers['Content-Length'] = str(len(self.data))
+        if 'connection' not in lower:
+            self.BytesHeaders += 'Connection: Keep-Alive\r\n'
+
+        if 'user-agent' not in lower:
+            self.BytesHeaders += 'User-Agent: Mozilla/5.0 Firefox/132.0\r\n'
+
+        if self.setJson and 'content-type' not in lower:
+            self.BytesHeaders += 'Content-Type: application/json\r\n'
+
+        if 'content-length' not in lower:
+            self.BytesHeaders += f'Content-Length: {str(len(self.data))}\r\n'
 
         for key, value in self.headers.items():
             self.BytesHeaders += f'{key}: {value}\r\n'
@@ -66,13 +78,13 @@ class request:
     @data.setter
     def data(self, data: Optional[Union[str, dict]]) -> None:
         if isinstance(data, dict):
+            self.setJson = False
             self._data = urlencode(data)
-            self.setJson = False  # Clear JSON flag if data is set
         else:
             self._data = data
 
         self._set_default_headers()
-    
+        
     @property
     def json(self):
         return self._json
@@ -80,35 +92,7 @@ class request:
     @json.setter
     def json(self, json: dict) -> None:
         self.setJson = True
-        self._data = dumps(json)  # Use _data for JSON representation
-        self._set_default_headers()  # Update headers based on new JSON data
+        self.data = dumps(json)
 
     def __bytes__(self) -> bytes:
         return f'{self.method} {self.api} HTTP/1.1\r\n{self.auth_proxy}{self.BytesHeaders}\r\n{self.data}'.encode('utf-8')
-    
-req = request()
-req.method = 'POST'
-req.url = 'httpbin.org/post'
-req.data = {'name':'ahmed'}
-
-print(bytes(req))
-
-
-
-
-
-import fiberhttp
-cn = fiberhttp.client()
-
-test = cn.send(req)
-print(test.text())
-
-# print(requests.post('https://httpbin.org/post', json={'name':'ahmed'}))
-
-#raise_for_status
-
-
-
-
-# new_connection(REQ.parse.hostname, REQ.parse.port or (80 if REQ.parse.scheme == 'http' else 443))
-# connection / url

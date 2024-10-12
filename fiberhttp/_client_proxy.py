@@ -9,7 +9,7 @@ from re import search
 
 class client_proxy:
     def __init__(self, proxy:str, timeout:int=10) -> None:
-        self.time_out: int = timeout
+        self.timeout: int = timeout
         self.running: bool = False
         self.connection = None
         self.host_connected : str = ''
@@ -31,7 +31,7 @@ class client_proxy:
         response: bytes = b''
         start = time()
 
-        while time() - start < self.time_out:
+        while time() - start < self.timeout:
             recv = self.connection.recv(4096)
             response += recv
 
@@ -60,14 +60,14 @@ class client_proxy:
     def delete(self, url:str, headers:dict={}):
         return self.get(url, headers, 'DELETE')
     
-    def put(self, url:str, headers:dict={}, data=Optional[Union[str, dict]]):
-        return self.post(url, headers, data, 'PUT')
+    def put(self, url:str, headers:dict={}, data: Optional[Union[str, dict]]='', json:dict=None):
+        return self.post(url, headers, data, json, 'PUT')
     
-    def patch(self, url:str, headers:dict={}, data=Optional[Union[str, dict]]):
-        return self.post(url, headers, data, 'PATCH')
+    def patch(self, url:str, headers:dict={}, data: Optional[Union[str, dict]]='', json:dict=None):
+        return self.post(url, headers, data, json, 'PATCH')
 
-    def post(self, url:str, headers:dict={}, data=Optional[Union[str, dict]], method:str='POST'):
-        REQ = request(method, url, headers, data, self.proxy_auth)
+    def post(self, url:str, headers:dict={}, data: Optional[Union[str, dict]]='', json:dict=None, method:str='POST'):
+        REQ = request(method, url, headers, data, json, self.proxy_auth)
         host: str = REQ.parse.hostname
 
         if not self.connection:
