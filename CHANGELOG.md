@@ -19,3 +19,8 @@
 - Added fiberhttp.request() feature
 - Removed `build` and `build_proxy` Functions
 - Removed `host` argument from `send` Function
+
+## v4.1 (24/10/13)
+### Added Json Argument
+- Added Json Argument in request
+- Added Json content type in default headers
