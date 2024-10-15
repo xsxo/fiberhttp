@@ -4,7 +4,7 @@
 
 ![GIF](media/1725894429188248.gif)
 
-The [benchmarks](https://github.com/xsxo/fiberhttp/tree/main/benchmarks) folder contains comparisons between `Fiberhttp` and other well-known libraries such as `requests`, `httpx`, `http.client`, and others. You will notice that `Fiberhttp` outperforms them every time<br/>
+The [benchmarks](https://github.com/xsxo/fiberhttp/tree/main/benchmarks) folder contains comparisons between `FiberHTTP` and other well-known libraries such as `requests`, `httpx`, `http.client`, and others. You will notice that `FiberHTTP` outperforms them every time<br/>
 
 
 ## Fiberhttp might not for you
@@ -84,10 +84,10 @@ import fiberhttp
 cn = fiberhttp.client()
 
 # prepare request with this format
-request = fiberhttp.request('GET', 'https://httpbni.org/ip')
+request = fiberhttp.request('GET', 'https://httpbin.org/ip')
 
 # send request after prepare it
-response = cn.send('httpbin.org', request).json()
+response = cn.send(request).json()
 ```
 
 
@@ -98,11 +98,11 @@ import fiberhttp
 
 cn = fiberhttp.client()
 
-request = fiberhttp.request('GET', 'https://httpbni.org/ip')
+request = fiberhttp.request('GET', 'https://httpbin.org/ip')
 
 # create connection with host
 cn.connect('httpbin.org')
 
-response = cn.send('httpbin.org', request).text()
+response = cn.send(request).text()
 print(response)
 ```
