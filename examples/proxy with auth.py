@@ -1,7 +1,7 @@
 import fiberhttp
 
 # http://username:password@host:port
-cn = fiberhttp.client_proxy('http://Heisenberg:505152@20.111.54.16:8123', proxy_ssl=False)
+cn = fiberhttp.Client_Proxy('http://Heisenberg:505152@20.111.54.16:8123', proxy_ssl=False)
 
 for _ in range(10):
     data = 'number=' + str(_)

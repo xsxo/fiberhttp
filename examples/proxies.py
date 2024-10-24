@@ -1,6 +1,6 @@
 import fiberhttp
 
-cn = fiberhttp.client_proxy('http://20.111.54.16:8123', proxy_ssl=False)
+cn = fiberhttp.Client_Proxy('http://20.111.54.16:8123', proxy_ssl=False)
 
 for _ in range(10):
     data = 'number=' + str(_)

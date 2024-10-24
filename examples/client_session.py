@@ -1,6 +1,6 @@
 import fiberhttp
 
-cn = fiberhttp.client()
+cn = fiberhttp.Client()
 
 for _ in range(10):
     data = 'number=' + str(_)

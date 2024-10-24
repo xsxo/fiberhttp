@@ -1,13 +1,14 @@
 from ._connections import new_connection_proxy, load_ssl
 from ._responses import ExtractResponses
-from ._build import request
+from ._build import Request
+from ._exceptions import CreateClientEachThreadException
 from typing import Optional, Union
 from urllib.parse import urlparse, ParseResult
 from time import time
 from base64 import b64encode
 from re import search
 
-class client_proxy:
+class Client_Proxy:
     def __init__(self, proxy:str, timeout:int=10) -> None:
         self.timeout: int = timeout
         self.running: bool = False
@@ -25,7 +26,7 @@ class client_proxy:
         self.connection.close()
         return 'closed'
 
-    def action(self, REQ:request) -> str:
+    def action(self, REQ:Request) -> str:
         self.running = True
         self.connection.send(bytes(REQ))
         response: bytes = b''
@@ -54,6 +55,11 @@ class client_proxy:
         else:
             raise ValueError('timeout')
 
+        if b'Connection: close' in headers:
+            self.host_connected = ''
+            self.connection.close()
+            self.connection = None
+
         self.running = False
         return response
 
@@ -67,7 +73,7 @@ class client_proxy:
         return self.post(url, headers, data, json, 'PATCH')
 
     def post(self, url:str, headers:dict={}, data: Optional[Union[str, dict]]='', json:dict=None, method:str='POST'):
-        REQ = request(method, url, headers, data, json, self.proxy_auth)
+        REQ = Request(method, url, headers, data, json, self.proxy_auth)
         host: str = REQ.parse.hostname
 
         if not self.connection:
@@ -78,12 +84,12 @@ class client_proxy:
             self.connect(host, REQ.parse.port or (80 if REQ.parse.scheme == 'http' else 443))
 
         elif self.running:
-            assert  ValueError('create a new client for each thread\nexample: https://github.com/xsxo/fiberhttp/tree/main/benchmarks')
+            raise CreateClientEachThreadException()
 
         return ExtractResponses(self.action(REQ))
 
     def get(self, url:str, headers:dict={}, method:str='GET'):
-        REQ = request(method, url, headers, self.proxy_auth)
+        REQ = Request(method, url, headers, self.proxy_auth)
         host: str = REQ.parse.hostname
         
         if not self.connection:
@@ -94,11 +100,11 @@ class client_proxy:
             self.connect(host, REQ.parse.port or (80 if REQ.parse.scheme == 'http' else 443))
 
         elif self.running:
-            assert  ValueError('create a new client for each thread\nexample: https://github.com/xsxo/fiberhttp/tree/main/benchmarks')
+            raise CreateClientEachThreadException()
         
         return ExtractResponses(self.action(REQ))
 
-    def send(self, REQ:request):
+    def send(self, REQ:Request):
         REQ.auth_proxy = self.proxy_auth
         host = REQ.parse.hostname
 
@@ -110,7 +116,7 @@ class client_proxy:
             self.connect(host, REQ.parse.port or (80 if REQ.parse.scheme == 'http' else 443))
 
         elif self.running:
-            assert  ValueError('create a new client for each thread\nexample: https://github.com/xsxo/fiberhttp/tree/main/benchmarks')
+            raise CreateClientEachThreadException()
 
         return ExtractResponses(self.action(REQ))
 

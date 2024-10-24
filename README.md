@@ -42,7 +42,7 @@ import fiberhttp
 
 # create client session with timeout
 # ! timeout arg not requierd
-cn = fiberhttp.client(timeout=10)
+cn = fiberhttp.Client(timeout=10)
 
 # send get request
 res = cn.get('https://httpbin.org/ip')
@@ -68,7 +68,7 @@ response = fiberhttp.get('https://httpbin.org/ip')
 import fiberhttp
 
 # create client proxy
-cn = fiberhttp.client_proxy('http://20.111.54.16:8123')
+cn = fiberhttp.Client_Proxy('http://20.111.54.16:8123')
 
 # send request after the proxy in the client session
 response = cn.get('https://httpbin.org/ip').json()['origin']
@@ -81,10 +81,10 @@ print(response)
 ```python3
 import fiberhttp
 
-cn = fiberhttp.client()
+cn = fiberhttp.Client()
 
 # prepare request with this format
-request = fiberhttp.request('GET', 'https://httpbin.org/ip')
+request = fiberhttp.Request('GET', 'https://httpbin.org/ip')
 
 # send request after prepare it
 response = cn.send(request).json()
@@ -96,9 +96,9 @@ response = cn.send(request).json()
 ```python3
 import fiberhttp
 
-cn = fiberhttp.client()
+cn = fiberhttp.Client()
 
-request = fiberhttp.request('GET', 'https://httpbin.org/ip')
+request = fiberhttp.Request('GET', 'https://httpbin.org/ip')
 
 # create connection with host
 cn.connect('httpbin.org')

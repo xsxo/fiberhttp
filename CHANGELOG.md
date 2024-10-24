@@ -16,7 +16,7 @@
 **Added Preparing Requests Feature**
 - Imporve sending requests
 - Imporve SSL Security
-- Added fiberhttp.request() feature
+- Added fiberhttp.Request() feature
 - Removed `build` and `build_proxy` Functions
 - Removed `host` argument from `send` Function
 
@@ -25,3 +25,6 @@
 - Added Json Argument in request
 - Added Json content type in default headers
 
+## v5.0 (24/10/24)
+**Added Exceptions**
+- Added _exceptions file in source folder

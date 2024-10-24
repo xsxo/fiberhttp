@@ -1,3 +1,4 @@
+from ._exceptions import JsonDecodeException, TextDecodeException
 from re import search
 from json import loads
 from typing import Union
@@ -17,13 +18,19 @@ class ExtractResponses:
         return self.response.split(b'\r\n\r\n', 1)[1]
 
     def text(self) -> str:
-        return self.response.split(b'\r\n\r\n', 1)[1].decode('utf-8')
+        try:
+            return self.response.split(b'\r\n\r\n', 1)[1].decode('utf-8')
+        except:
+            raise TextDecodeException()
     
     def status_code(self) -> int:
         return int(search(rb'HTTP/1.1 (\d{3})', self.response).group(1))
 
     def json(self) -> dict:
-        return loads(self.text())
+        try:
+            return loads(self.text())
+        except:
+            raise JsonDecodeException()
     
     def headers(self) -> dict:
         for_return : dict = {}
@@ -36,6 +43,7 @@ class ExtractResponses:
             for_return[for_split[0].decode('utf-8')] = res.removeprefix(for_split[0] + b': ').decode('utf-8')
 
         return for_return
+
     
     def cookie(self) -> Union[dict, None]:
         components = [component.strip() for component in self.headers().get('Set-Cookie', '').split(';')]

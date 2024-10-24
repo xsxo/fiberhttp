@@ -1,6 +1,6 @@
 import fiberhttp
 
-cn = fiberhttp.client()
+cn = fiberhttp.Client()
 
 # not required but preferred for high performance
 cn.connect('httpbin.org')

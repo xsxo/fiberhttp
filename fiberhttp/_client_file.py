@@ -1,11 +1,12 @@
 from ._connections import new_connection
 from ._responses import ExtractResponses
-from ._build import request
+from ._build import Request
+from ._exceptions import CreateClientEachThreadException
 from typing import Optional, Union
 from time import time
 from re import search
 
-class client:
+class Client:
     def __init__(self, timeout:int=10) -> None:
         self.timeout : int = timeout
         self.running : bool = False
@@ -23,7 +24,7 @@ class client:
             host.close()
         return 'closed'
 
-    def action(self, REQ:request) -> str:
+    def action(self, REQ:Request) -> str:
         self.running = True
         host = REQ.parse.hostname
 
@@ -54,6 +55,10 @@ class client:
         else:
             raise ValueError('timeout')
 
+        if b'Connection: close' in headers:
+            self.hosts[host].close()
+            self.hosts.pop(host)
+
         self.running = False
         return response
 
@@ -67,11 +72,11 @@ class client:
         return self.post(url, headers, data, json, 'PATCH')
 
     def post(self, url:str, headers:dict={}, data: Optional[Union[str, dict]]='', json:dict=None, method:str='POST'):
-        REQ = request(method, url, headers, data, json)
+        REQ = Request(method, url, headers, data, json)
         host : str = REQ.parse.hostname
 
         if self.running:
-            assert  ValueError('create a new client for each thread\nexample: https://github.com/xsxo/fiberhttp/tree/main/benchmarks')
+            raise CreateClientEachThreadException()
 
         elif host not in self.hosts:
             self.hosts[host] = new_connection(host, REQ.parse.port or (80 if REQ.parse.scheme == 'http' else 443))
@@ -79,11 +84,11 @@ class client:
         return ExtractResponses(self.action(REQ))
 
     def get(self, url:str, headers:dict={}, method:str='GET'):
-        REQ = request(method, url, headers)
+        REQ = Request(method, url, headers)
         host : str = REQ.parse.hostname
 
         if self.running:
-            assert  ValueError('create a new client for each thread\nexample: https://github.com/xsxo/fiberhttp/tree/main/benchmarks')
+            raise CreateClientEachThreadException()
 
         elif host not in self.hosts:
             self.hosts[host] = new_connection(host, REQ.parse.port or (80 if REQ.parse.scheme == 'http' else 443))        
@@ -101,9 +106,9 @@ class client:
         if host not in self.hosts:
             self.hosts[host] = new_connection(host, port)
 
-    def send(self, REQ:request):
+    def send(self, REQ:Request):
         if self.running:
-            assert  ValueError('create a new client for each thread\nexample: https://github.com/xsxo/fiberhttp/tree/main/benchmarks')
+            raise CreateClientEachThreadException()
         elif REQ.parse.hostname not in self.hosts:
             self.hosts[REQ.parse.hostname] = new_connection(REQ.parse.hostname, REQ.parse.port or (80 if REQ.parse.scheme == 'http' else 443))
 

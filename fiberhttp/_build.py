@@ -1,8 +1,9 @@
+from ._exceptions import InvalidScheme
 from urllib.parse import urlencode, urlparse
 from typing import Optional, Union
 from json import dumps
 
-class request:
+class Request:
     def __init__(self, method: str = None, url: str = None, headers: dict = {}, data: Optional[Union[str, dict]] = '', json: dict = None, auth_proxy: str = ''):
         self.parse = None
         self.api: str = ''
@@ -37,6 +38,10 @@ class request:
     def url(self, value: str) -> None:
         self._url = value 
         self.parse = urlparse(self._url)
+
+        if self._url and not self.parse.scheme:
+            raise InvalidScheme()
+
         self.api = (self.parse.path or '/') + ('?' + self.parse.query if self.parse.query else '')
         self._set_default_headers()
 
@@ -96,3 +101,4 @@ class request:
 
     def __bytes__(self) -> bytes:
         return f'{self.method} {self.api} HTTP/1.1\r\n{self.auth_proxy}{self.BytesHeaders}\r\n{self.data}'.encode('utf-8')
+    

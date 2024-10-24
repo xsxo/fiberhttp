@@ -1,16 +1,16 @@
 import unittest
-from fiberhttp import client, request
+from fiberhttp import Client, Request
 
 class TestHttpClientRequests(unittest.TestCase):
 
     def setUp(self):
-        self.client = client()
+        self.Client = Client()
 
     def tearDown(self):
-        self.client.close()
+        self.Client.close()
 
     def test_prepare(self):
-        REQ = request()
+        REQ = Request()
 
         REQ.method = 'GET'
         REQ.url = 'https://api64.ipify.org?format=json'
@@ -25,35 +25,35 @@ class TestHttpClientRequests(unittest.TestCase):
         REQ.method = 'POST'
         REQ.url = 'https://httpbin.org/post'
 
-        self.client.connect('httpbin.org')
+        self.Client.connect('httpbin.org')
 
-        response = self.client.send(REQ)
+        response = self.Client.send(REQ)
         self.assertEqual(response.status_code(), 200)
         self.assertIn(response.json()['json']['username'], 'ndoshy')
         # self.assertIn(list(response.json().keys())[0], 'origin')
 
     def test_get_request(self):
-        response = self.client.get('https://httpbin.org/get')
+        response = self.Client.get('https://httpbin.org/get')
         self.assertEqual(response.status_code(), 200)
         self.assertIn(response.json()['url'], 'https://httpbin.org/get')
 
     def test_post_request(self):
-        response = self.client.post('https://httpbin.org/post', json={'username':'ndoshy'})
+        response = self.Client.post('https://httpbin.org/post', json={'username':'ndoshy'})
         self.assertEqual(response.status_code(), 200)
         self.assertEqual(response.json()['json']['username'], 'ndoshy')
 
     def test_put_request(self):
-        response = self.client.put('https://httpbin.org/put', data={'username':'ndoshy'})
+        response = self.Client.put('https://httpbin.org/put', data={'username':'ndoshy'})
         self.assertEqual(response.status_code(), 200)
         self.assertEqual(response.json()['data'], 'username=ndoshy')
 
     def test_delete_request(self):
-        response = self.client.delete('https://httpbin.org/delete')
+        response = self.Client.delete('https://httpbin.org/delete')
         self.assertEqual(response.status_code(), 200)
         self.assertIn(response.json()['url'], 'https://httpbin.org/delete')
 
     def test_patch_request(self):
-        response = self.client.patch('https://httpbin.org/patch', data={'username':'ndoshy'})
+        response = self.Client.patch('https://httpbin.org/patch', data={'username':'ndoshy'})
         self.assertEqual(response.status_code(), 200)
         self.assertEqual(response.json()['data'], 'username=ndoshy')
 

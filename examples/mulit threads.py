@@ -3,7 +3,7 @@ import threading
 
 # new client for each thread
 def start_thread():
-    cn = fiberhttp.client()
+    cn = fiberhttp.Client()
     data = 'number=' + str(_)
     RES = cn.post('https://httpbin.org/post', data=data)
     
