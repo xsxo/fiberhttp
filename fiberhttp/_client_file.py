@@ -1,7 +1,7 @@
 from ._connections import new_connection
 from ._responses import ExtractResponses
 from ._build import Request
-from ._exceptions import CreateClientEachThreadException
+from ._exceptions import CreateClientEachThreadException, TimeoutReadingException, ClientConnectionException
 from typing import Optional, Union
 from time import time
 from re import search
@@ -25,42 +25,58 @@ class Client:
         return 'closed'
 
     def action(self, REQ:Request) -> str:
-        self.running = True
-        host = REQ.parse.hostname
+        try:
+            self.running = True
+            host = REQ.parse.hostname
 
-        self.hosts[host].send(bytes(REQ))
-        response : bytes = b''
-        start = time()
+            self.hosts[host].send(bytes(REQ))
+            response : bytes = b''
+            start = time()
 
-        while time() - start < self.timeout:
-            recv = self.hosts[host].recv(4096)
-            response += recv
+            while time() - start < self.timeout:
+                recv = self.hosts[host].recv(4096)
+                response += recv
 
-            if not recv:
-                break
-            
-            elif b'\r\n\r\n' in response:
-                headers, body = response.split(b'\r\n\r\n', 1)
+                if not recv:
+                    break
+                
+                elif b'\r\n\r\n' in response:
+                    headers, body = response.split(b'\r\n\r\n', 1)
 
-                content_length_match = search(rb'Content-Length: (\d+)', headers)
-                transfer_encoding_chunked = b'Transfer-Encoding: chunked' in headers
+                    content_length_match = search(rb'Content-Length: (\d+)', headers)
+                    transfer_encoding_chunked = b'Transfer-Encoding: chunked' in headers
 
-                if content_length_match:
-                    content_length = int(content_length_match.group(1))
-                    if len(body) >= content_length:
-                        break
-                elif transfer_encoding_chunked:
-                    if b'\n\r\n0\r\n\r\n' in body:
-                        break
-        else:
-            raise ValueError('timeout')
+                    if content_length_match:
+                        content_length = int(content_length_match.group(1))
+                        if len(body) >= content_length:
+                            break
+                    elif transfer_encoding_chunked:
+                        if b'\n\r\n0\r\n\r\n' in body:
+                            break
+            else:
+                raise TimeoutReadingException()
 
-        if b'Connection: close' in headers:
-            self.hosts[host].close()
+            if b'Connection: close' in headers:
+                self.hosts.pop(host)
+                self.running = False
+
+                try:
+                    self.hosts[host].close()
+                except:
+                    pass
+
+            self.running = False
+            return response
+        except:
             self.hosts.pop(host)
+            self.running = False
 
-        self.running = False
-        return response
+            try:
+                self.hosts[host].close()
+            except:
+                pass
+
+            raise ClientConnectionException()
 
     def delete(self, url:str, headers:dict={}):
         return self.get(url, headers, 'DELETE')

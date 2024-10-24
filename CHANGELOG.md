@@ -28,3 +28,7 @@
 ## v5.0 (24/10/24)
 **Added Exceptions**
 - Added _exceptions file in source folder
+
+## v5.0.1 (24/10/24)
+**Added auto reconnect feauter**
+- Auto reconnect if send request in closed connection

@@ -1,7 +1,7 @@
 from ._connections import new_connection_proxy, load_ssl
 from ._responses import ExtractResponses
 from ._build import Request
-from ._exceptions import CreateClientEachThreadException
+from ._exceptions import CreateClientEachThreadException, ProxyConnectionException, TimeoutReadingException
 from typing import Optional, Union
 from urllib.parse import urlparse, ParseResult
 from time import time
@@ -27,41 +27,60 @@ class Client_Proxy:
         return 'closed'
 
     def action(self, REQ:Request) -> str:
-        self.running = True
-        self.connection.send(bytes(REQ))
-        response: bytes = b''
-        start = time()
+        try:
+            self.running = True
+            self.connection.send(bytes(REQ))
 
-        while time() - start < self.timeout:
-            recv = self.connection.recv(4096)
-            response += recv
+            response: bytes = b''
+            start = time()
 
-            if not recv:
-                break
+            while time() - start < self.timeout:
+                recv = self.connection.recv(4096)
+                response += recv
 
-            elif b'\r\n\r\n' in response:
-                headers, body = response.split(b'\r\n\r\n', 1)
+                if not recv:
+                    break
 
-                content_length_match = search(rb'Content-Length: (\d+)', headers)
-                transfer_encoding_chunked = b'Transfer-Encoding: chunked' in headers
+                elif b'\r\n\r\n' in response:
+                    headers, body = response.split(b'\r\n\r\n', 1)
 
-                if content_length_match:
-                    content_length = int(content_length_match.group(1))
-                    if len(body) >= content_length:
-                        break
-                elif transfer_encoding_chunked:
-                    if b'0\r\n\r\n' in body:
-                        break
-        else:
-            raise ValueError('timeout')
+                    content_length_match = search(rb'Content-Length: (\d+)', headers)
+                    transfer_encoding_chunked = b'Transfer-Encoding: chunked' in headers
 
-        if b'Connection: close' in headers:
+                    if content_length_match:
+                        content_length = int(content_length_match.group(1))
+                        if len(body) >= content_length:
+                            break
+                    elif transfer_encoding_chunked:
+                        if b'0\r\n\r\n' in body:
+                            break
+            else:
+                raise TimeoutReadingException()
+
+            if b'Connection: close' in headers:
+                self.host_connected = ''
+                self.running = False
+
+                try:
+                    self.connection.close()
+                except:
+                    pass
+
+                self.connection = None
+
+            self.running = False
+            return response
+        except:
             self.host_connected = ''
-            self.connection.close()
-            self.connection = None
+            self.running = False
 
-        self.running = False
-        return response
+            try:
+                self.connection.close()
+            except:
+                pass
+            
+            self.connection = None
+            raise ProxyConnectionException()
 
     def delete(self, url:str, headers:dict={}):
         return self.get(url, headers, 'DELETE')

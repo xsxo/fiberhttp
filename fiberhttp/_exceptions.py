@@ -33,3 +33,12 @@ class MissingSchemaException(Exception):
 class InvalidScheme(Exception):
     def __str__(self):
         return "invalid URL scheme (http:// or https://)"
+    
+
+class ProxyConnectionException(Exception):
+    def __str__(self):
+        return "the proxy connection has been disconnected"
+    
+class ClientConnectionException(Exception):
+    def __str__(self):
+        return "the client connection has been disconnected"
