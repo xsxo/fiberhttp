@@ -29,7 +29,9 @@ class Client:
             self.running = True
             host = REQ.parse.hostname
 
-            self.hosts[host].send(bytes(REQ))
+            if not REQ.raw_request:
+                REQ.load()
+            self.hosts[host].send(REQ.raw_request)
             response : bytes = b''
             start = time()
 

@@ -29,7 +29,10 @@ class Client_Proxy:
     def action(self, REQ:Request) -> str:
         try:
             self.running = True
-            self.connection.send(bytes(REQ))
+
+            if not REQ.raw_request:
+                REQ.load()
+            self.connection.send(REQ.raw_request)
 
             response: bytes = b''
             start = time()
@@ -92,7 +95,7 @@ class Client_Proxy:
         return self.post(url, headers, data, json, 'PATCH')
 
     def post(self, url:str, headers:dict={}, data: Optional[Union[str, dict]]='', json:dict=None, method:str='POST'):
-        REQ = Request(method, url, headers, data, json, self.proxy_auth)
+        REQ = Request(method, url, headers, data, json)
         host: str = REQ.parse.hostname
 
         if not self.connection:
@@ -108,7 +111,7 @@ class Client_Proxy:
         return ExtractResponses(self.action(REQ))
 
     def get(self, url:str, headers:dict={}, method:str='GET'):
-        REQ = Request(method, url, headers, self.proxy_auth)
+        REQ = Request(method, url, headers)
         host: str = REQ.parse.hostname
         
         if not self.connection:
@@ -124,7 +127,6 @@ class Client_Proxy:
         return ExtractResponses(self.action(REQ))
 
     def send(self, REQ:Request):
-        REQ.auth_proxy = self.proxy_auth
         host = REQ.parse.hostname
 
         if not self.connection:

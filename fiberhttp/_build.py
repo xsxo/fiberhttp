@@ -4,7 +4,7 @@ from typing import Optional, Union
 from json import dumps
 
 class Request:
-    def __init__(self, method: str = None, url: str = None, headers: dict = {}, data: Optional[Union[str, dict]] = '', json: dict = None, auth_proxy: str = ''):
+    def __init__(self, method: str = None, url: str = None, headers: dict = {}, data: Optional[Union[str, dict]] = '', json: dict = None):
         self.parse = None
         self.api: str = ''
         self.BytesHeaders: str = ''
@@ -12,7 +12,6 @@ class Request:
         
         self.method = method
         self._url: str = url
-        self.auth_proxy: str = auth_proxy
         # self._headers = headers if headers is not None else {}
         self._headers = headers
         self._json = json
@@ -29,13 +28,17 @@ class Request:
 
         if self._json:
             self.json = json
+        
+        self.raw_request = ''
 
     @property
     def url(self):
+        self.raw_request = ''
         return self._url
     
     @url.setter
     def url(self, value: str) -> None:
+        self.raw_request = ''
         self._url = value 
         self.parse = urlparse(self._url)
 
@@ -47,14 +50,17 @@ class Request:
 
     @property
     def headers(self):
+        self.raw_request = ''
         return self._headers
 
     @headers.setter
     def headers(self, value: dict) -> None:
+        self.raw_request = ''
         self._headers = value
         self._set_default_headers()
 
     def _set_default_headers(self) -> None:
+        self.raw_request = ''
         self.BytesHeaders = ''
         lower = [key.lower() for key in self._headers.keys()]
 
@@ -78,10 +84,12 @@ class Request:
 
     @property
     def data(self):
+        self.raw_request = ''
         return self._data
 
     @data.setter
     def data(self, data: Optional[Union[str, dict]]) -> None:
+        self.raw_request = ''
         if isinstance(data, dict):
             self.setJson = False
             self._data = urlencode(data)
@@ -92,13 +100,15 @@ class Request:
         
     @property
     def json(self):
+        self.raw_request = ''
         return self._json
     
     @json.setter
     def json(self, json: dict) -> None:
+        self.raw_request = ''
         self.setJson = True
         self.data = dumps(json)
 
-    def __bytes__(self) -> bytes:
-        return f'{self.method} {self.api} HTTP/1.1\r\n{self.auth_proxy}{self.BytesHeaders}\r\n{self.data}'.encode('utf-8')
+    def load(self) -> bytes:
+        self.raw_request = f'{self.method} {self.api} HTTP/1.1\r\n{self.BytesHeaders}\r\n{self.data}'.encode('utf-8')
     

@@ -29,6 +29,18 @@ If these features are important to you, and you value compatibility and function
 - High-performance SSL/TLS handshake, verify
 - Reading responses in various formats such as JSON, headers, Cookies
 
+## Benchmarks
+Benchmarks Codes: [benchmarks](https://github.com/xsxo/fiberhttp/tree/main/benchmarks)
+
+|**Library**|**Results (Lower is Better)**|
+|-----------|-------------------|
+|FiberHTTP|1,000,000 HTTP Requests in 18 SEC'S|
+|http.client|1,000,000 HTTP Requests in 92 SEC'S|
+|AIOHTTP|1,000,000 HTTP Requests in 162 SEC'S|
+|urllib3|1,000,000 HTTP Requests in 221 SEC'S|
+|HTTPX|1,000,000 HTTP Requests in 332 SEC'S|
+|HTTPX-ASYNC|1,000,000 HTTP Requests in 427 SEC'S|
+|requests|1,000,000 HTTP Requests in 472 SEC'S|
 
 ## How to use
 install Fiberhttp (supported all os systems)

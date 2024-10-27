@@ -32,3 +32,9 @@
 ## v5.0.1 (24/10/24)
 **Added auto reconnect feauter**
 - Auto reconnect if send request in closed connection
+
+## v5.1 (24/10/27)
+**Fix proxy authorization**
+- Removed proxy authorization from raw request
+- Imporve sending request in socket connection
+- Add benchmarks in main README.md

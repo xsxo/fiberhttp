@@ -1,5 +1,4 @@
 import socket
-from random import randint
 from threading import Thread
 
 HOST = 'localhost'
@@ -16,7 +15,7 @@ def recv_send(ssl_socket):
     while True:
         try:
             ssl_socket.recv(1024)
-            data = f"random={str(randint(1, 100000000000))}"
+            data = f"random"
             response = "HTTP/1.1 200 OK\r\n"
             response += "Content-Type: text/html\r\n"
             response += f"Content-Length: {len(data)}\r\n"
