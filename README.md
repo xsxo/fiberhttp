@@ -1,15 +1,15 @@
-# FiberHTTP [![Supported Versions](https://img.shields.io/pypi/pyversions/fiberhttp.svg)](https://pypi.org/project/fiberhttp)
+FiberHTTP [![Supported Versions](https://img.shields.io/pypi/pyversions/fiberhttp.svg)](https://pypi.org/project/fiberhttp)
 
 `FiberHTTP` High Performance HTTP Requests Library<br/>
 
-![GIF](media/1725894429188248.gif)
+<!-- ![GIF](media/1725894429188248.gif)
 
-The [benchmarks](https://github.com/xsxo/fiberhttp/tree/main/benchmarks) folder contains comparisons between `FiberHTTP` and other well-known libraries such as `requests`, `httpx`, `http.client`, and others. You will notice that `FiberHTTP` outperforms them every time<br/>
+The [benchmarks](https://github.com/xsxo/fiberhttp/tree/main/benchmarks) folder contains comparisons between `FiberHTTP` and other well-known libraries such as `requests`, `httpx`, `http.client`, and others. You will notice that `FiberHTTP` outperforms them every time<br/> -->
 
 
 ## Fiberhttp might not for you
 
-Fiberhttp is designed to provide high performance but lacks many features like:
+FiberHTTP is designed to provide high performance but lacks many features like:
 
 **missing Features**:
 - No Support streaming requests
