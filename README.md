@@ -21,7 +21,7 @@ All these features are not supported by the library for the purpose of improving
 If these features are important to you, and you value compatibility and functionality over performance, then the requests library might be a better choice for you.
 
 
-## Features:
+## Features
 - Keep-alive (socket connection)
 - Upload & Download Multi Files
 - Prepare bytes request before send
