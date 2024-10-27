@@ -1,4 +1,4 @@
-FiberHTTP [![Supported Versions](https://img.shields.io/pypi/pyversions/fiberhttp.svg)](https://pypi.org/project/fiberhttp)
+**FiberHTTP** [![Supported Versions](https://img.shields.io/pypi/pyversions/fiberhttp.svg)](https://pypi.org/project/fiberhttp)
 
 `FiberHTTP` High Performance HTTP Requests Library<br/>
 
