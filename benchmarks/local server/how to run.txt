@@ -1,0 +1,3 @@
+python: python3 server.py
+golang: go run server.go
+c: gcc server.c -o server -lws2_32

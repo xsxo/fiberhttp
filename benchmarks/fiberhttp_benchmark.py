@@ -23,7 +23,7 @@ def test():
     CN_FIBERHTTP : Client = Client(timeout=0.4)
     while counter.ok <= NUMBER:
         try:
-            if CN_FIBERHTTP.send(BUILD).text().__contains__('random'):
+            if CN_FIBERHTTP.send(BUILD).content().__contains__(b'random'):
                 counter.ok += 1
             else:
                 counter.error += 1

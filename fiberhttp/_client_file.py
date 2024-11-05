@@ -46,14 +46,13 @@ class Client:
                     headers, body = response.split(b'\r\n\r\n', 1)
 
                     content_length_match = search(rb'Content-Length: (\d+)', headers)
-                    transfer_encoding_chunked = b'Transfer-Encoding: chunked' in headers
+                    # transfer_encoding_chunked = b'Transfer-Encoding: chunked' in headers
 
                     if content_length_match:
                         content_length = int(content_length_match.group(1))
                         if len(body) >= content_length:
                             break
-                    elif transfer_encoding_chunked:
-                        if b'\n\r\n0\r\n\r\n' in body:
+                    elif b'\n\r\n0\r\n\r\n' in body:
                             break
             else:
                 raise TimeoutReadingException()
